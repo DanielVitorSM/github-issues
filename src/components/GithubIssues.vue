@@ -64,13 +64,20 @@
           v-for="issue in issues"
           :key="issue.id"
         >
-          <td>
+          <td class="row">
             <a
               @click.prevent.stop="getIssue(issue.number)"
               href="#"
+              class="col-7"
             >
               {{ issue.number }}
             </a>
+            <img
+              v-if="loaders.getIssue.number == issue.number && loaders.getIssue.loading" 
+              src="/static/loading.svg" 
+              width="20"
+              class="col-5"
+            >
           </td>
           <td>{{ issue.title }}</td>
         </tr>
@@ -92,7 +99,7 @@ export default {
       selectedIssue: {},
       loaders: {
         getIssues: false,
-        getIssue: false
+        getIssue: { loading: false, number: 0 }
       }
     }
   },
@@ -120,7 +127,7 @@ export default {
     },
     getIssue (issueNumber) {
       if (this.username && this.repository) {
-        this.loaders.getIssue = true
+        this.loaders.getIssue = { loading: true, number: issueNumber }
         const url = `https://api.github.com/repos/${this.username}/${this.repository}/issues/${issueNumber}`
         axios
           .get(url)
@@ -131,7 +138,7 @@ export default {
             alert('Erro ao processar requisição.')
           })
           .finally(() => {
-            this.loaders.getIssue = false
+            this.loaders.getIssue.loading = false
           })
       }
     },
