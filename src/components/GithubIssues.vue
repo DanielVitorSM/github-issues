@@ -25,17 +25,7 @@
 
     <br><br><br>
 
-    <template v-if="selectedIssue.id">
-      <h2>{{ selectedIssue.title }}</h2>
-      <div>{{ selectedIssue.body }}</div>
-      <a
-        @click.prevent.stop="clearIssue()"
-        href="#"
-        class="btn btn-primary"
-      > Voltar </a>
-    </template>
-
-    <table v-if="!selectedIssue.id" class="table table-sm table-striped">
+    <table class="table table-sm table-striped">
       <thead class="table-light">
         <tr>
           <td width="100">Número</td>
@@ -65,19 +55,11 @@
           :key="issue.id"
         >
           <td class="row">
-            <a
-              @click.prevent.stop="getIssue(issue.number)"
-              href="#"
-              class="col-7"
+            <router-link
+              :to="{ name: 'GithubIssue', params: { name: username, repo: repository, issue: issue.number }}"
             >
               {{ issue.number }}
-            </a>
-            <img
-              v-if="loaders.getIssue.number == issue.number && loaders.getIssue.loading" 
-              src="/static/loading.svg" 
-              width="20"
-              class="col-5"
-            >
+            </router-link>
           </td>
           <td>{{ issue.title }}</td>
         </tr>
@@ -96,10 +78,8 @@ export default {
       username: '',
       repository: '',
       issues: [],
-      selectedIssue: {},
       loaders: {
-        getIssues: false,
-        getIssue: { loading: false, number: 0 }
+        getIssues: false
       }
     }
   },
@@ -124,26 +104,6 @@ export default {
             this.loaders.getIssues = false
           })
       }
-    },
-    getIssue (issueNumber) {
-      if (this.username && this.repository) {
-        this.loaders.getIssue = { loading: true, number: issueNumber }
-        const url = `https://api.github.com/repos/${this.username}/${this.repository}/issues/${issueNumber}`
-        axios
-          .get(url)
-          .then(res => {
-            this.selectedIssue = res.data
-          })
-          .catch(() => {
-            alert('Erro ao processar requisição.')
-          })
-          .finally(() => {
-            this.loaders.getIssue.loading = false
-          })
-      }
-    },
-    clearIssue () {
-      this.selectedIssue = {}
     }
   }
 }
