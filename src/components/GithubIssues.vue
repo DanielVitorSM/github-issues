@@ -1,5 +1,5 @@
 <template>
-  <div class="container w-50">
+  <div class="container">
     <div>
       <div class="text-center mt-5">
         <h1>Vue.js + Github</h1>
@@ -7,12 +7,18 @@
       </div>
       <div class="row mt-5">
         <div class="col-8 row">
-          <input type="text" class="form-control col" name="user" placeholder="user">
-          <input type="text" class="form-control col" name="repository" placeholder="repository">
+          <input type="text" class="form-control col" v-model="username" placeholder="user">
+          <input type="text" class="form-control col" v-model="repository" placeholder="repository">
         </div>
         <div class="col-4 row">
-          <button class="btn btn-success col-6">Go</button>
-          <button class="btn btn-danger col-6">Limpar</button>
+          <button
+            @click.prevent.stop="getIssues()"
+            class="btn btn-success col-6"
+          >Go</button>
+          <button
+            @click.prevent.stop="reset()"
+            class="btn btn-danger col-6"
+          >Limpar</button>
         </div>
       </div>
     </div>
@@ -27,8 +33,15 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
+        <tr v-if="!!issues.length">
           <td class="text-center" colspan="4">Nenhum issues encontrado!</td>
+        </tr>
+        <tr
+          v-for="issue in issues"
+          :key="issue.id"
+        >
+          <td>{{ issue.number }}</td>
+          <td>{{ issue.title }}</td>
         </tr>
       </tbody>
     </table>
@@ -36,16 +49,33 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: 'GithubIssues',
   data () {
     return {
-
+      username: '',
+      repository: '',
+      issues: []
+    }
+  },
+  methods: {
+    reset () {
+      this.username = ''
+      this.repository = ''
+    },
+    getIssues () {
+      const url = `https://api.github.com/repos/${this.username}/${this.repository}/issues`
+      axios
+        .get(url)
+        .then(res => {
+          this.issues = res.data
+        })
+        .catch(() => {
+          alert('Erro ao processar requisição.')
+        })
     }
   }
 }
 </script>
-
-<style>
-
-</style>
