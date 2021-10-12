@@ -32,10 +32,24 @@
           <td>Título</td>
         </tr>
       </thead>
-      <tbody>
-        <tr v-if="!!issues.length">
+      <tbody
+        v-if="!!!issues.length"
+      >
+        <tr v-if="!loaders.getIssues">
           <td class="text-center" colspan="4">Nenhum issues encontrado!</td>
         </tr>
+
+        <tr
+          v-if="loaders.getIssues"
+        >
+          <td colspan="2" class="text-center">
+            <img src="/static/loading.svg" width="50">
+          </td>
+        </tr>
+      </tbody>
+      <tbody
+        v-if="!!issues.length && !loaders.getIssues"
+      >
         <tr
           v-for="issue in issues"
           :key="issue.id"
@@ -57,7 +71,10 @@ export default {
     return {
       username: '',
       repository: '',
-      issues: []
+      issues: [],
+      loaders: {
+        getIssues: false
+      }
     }
   },
   methods: {
@@ -66,15 +83,21 @@ export default {
       this.repository = ''
     },
     getIssues () {
-      const url = `https://api.github.com/repos/${this.username}/${this.repository}/issues`
-      axios
-        .get(url)
-        .then(res => {
-          this.issues = res.data
-        })
-        .catch(() => {
-          alert('Erro ao processar requisição.')
-        })
+      if (this.username && this.repository) {
+        this.loaders.getIssues = true
+        const url = `https://api.github.com/repos/${this.username}/${this.repository}/issues`
+        axios
+          .get(url)
+          .then(res => {
+            this.issues = res.data
+          })
+          .catch(() => {
+            alert('Erro ao processar requisição.')
+          })
+          .finally(() => {
+            this.loaders.getIssues = false
+          })
+      }
     }
   }
 }
