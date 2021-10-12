@@ -5,6 +5,11 @@
         <h1>Vue.js + Github</h1>
         <p>Consultando a API do Github e exibindo os issues usando Vue.js.</p>
       </div>
+
+      <div v-if="response.status === 'error'" class="alert alert-danger text-center">
+        {{ response.message }}
+      </div>
+
       <div class="row mt-5">
         <div class="col-8 row">
           <input type="text" class="form-control col" v-model="username" placeholder="user">
@@ -48,7 +53,7 @@
         </tr>
       </tbody>
       <tbody
-        v-if="!!issues.length && !loaders.getIssues"
+        v-if="showIssues"
       >
         <tr
           v-for="issue in issues"
@@ -83,6 +88,10 @@ export default {
       issues: [],
       loaders: {
         getIssues: false
+      },
+      response: {
+        status: '',
+        message: ''
       }
     }
   },
@@ -90,6 +99,7 @@ export default {
     reset () {
       this.username = ''
       this.repository = ''
+      localStorage.removeItem('github:issues')
     },
     getIssues () {
       if (this.username && this.repository) {
@@ -101,8 +111,13 @@ export default {
             this.issues = res.data
             localStorage.setItem('github:issues', JSON.stringify({ username: this.username, repository: this.repository }))
           })
-          .catch(() => {
-            alert('Erro ao processar requisição.')
+          .catch((error) => {
+            switch (error.response.status) {
+              case 404:
+                this.response = { status: 'error', message: 'Esse repositório não existe' }
+                this.issues = []
+                break
+            }
           })
           .finally(() => {
             this.loaders.getIssues = false
@@ -111,11 +126,16 @@ export default {
     },
     getLocalData () {
       const localData = JSON.parse(localStorage.getItem('github:issues'))
-      if (localData.username && localData.repository) {
+      if (localData && localData.username && localData.repository) {
         this.username = localData.username
         this.repository = localData.repository
         this.getIssues()
       }
+    }
+  },
+  computed: {
+    showIssues () {
+      return !!this.issues.length && !this.loaders.getIssues
     }
   }
 }
