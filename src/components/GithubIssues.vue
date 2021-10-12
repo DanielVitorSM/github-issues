@@ -73,6 +73,9 @@ import axios from 'axios'
 
 export default {
   name: 'GithubIssues',
+  created () {
+    this.getLocalData()
+  },
   data () {
     return {
       username: '',
@@ -96,6 +99,7 @@ export default {
           .get(url)
           .then(res => {
             this.issues = res.data
+            localStorage.setItem('github:issues', JSON.stringify({ username: this.username, repository: this.repository }))
           })
           .catch(() => {
             alert('Erro ao processar requisição.')
@@ -103,6 +107,14 @@ export default {
           .finally(() => {
             this.loaders.getIssues = false
           })
+      }
+    },
+    getLocalData () {
+      const localData = JSON.parse(localStorage.getItem('github:issues'))
+      if (localData.username && localData.repository) {
+        this.username = localData.username
+        this.repository = localData.repository
+        this.getIssues()
       }
     }
   }
