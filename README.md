@@ -1,21 +1,23 @@
-# github-issues
+# Vue 3 + Github
 
 > Projeto desenvolvido durante o curso Vue Js do Jeito Ninja, ministrado por Tiago Matos.
 
-## Build Setup
+## Instalação
 
 ``` bash
-# install dependencies
+# instalando dependências
 npm install
 
-# serve with hot reload at localhost:8080
+# serve com carregamento rápido localhost:8080
 npm run dev
 
-# build for production with minification
+# build para produção com minificação
 npm run build
 
-# build for production and view the bundle analyzer report
+# build para produção e ver o relatório de bundle
 npm run build --report
 ```
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+## Links
+[Vue do Jeito Ninja](https://www.youtube.com/playlist?list=PLcoYAcR89n-qq1vGRbaUiV6Q9puy0qigW)
+[Vue JS](https://vuejs.org/)
